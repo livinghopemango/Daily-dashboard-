@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>윌리엄 패권 대시보드 — 6/18 목요일</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700,900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0b09;--surface:#131210;--surface-2:#191714;--surface-3:#1e1c19;
+  --border:rgba(255,255,255,0.07);--text:#e4e2dd;--muted:#797670;--faint:#46443e;
+  --green:#4dba75;--green-d:rgba(77,186,117,0.1);--green-b:rgba(77,186,117,0.22);
+  --red:#e05858;--red-d:rgba(224,88,88,0.1);--red-b:rgba(224,88,88,0.22);
+  --amber:#e8a020;--amber-d:rgba(232,160,32,0.1);--amber-b:rgba(232,160,32,0.22);
+  --blue:#5594ca;--blue-d:rgba(85,148,202,0.1);--blue-b:rgba(85,148,202,0.2);
+  --purple:#9b72d0;--purple-d:rgba(155,114,208,0.1);--purple-b:rgba(155,114,208,0.2);
+  --font:'Satoshi','Apple SD Gothic Neo',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-font-smoothing:antialiased;}
+body{font-family:var(--font);font-size:.875rem;color:var(--text);background:var(--bg);min-height:100vh;line-height:1.5;}
+
+.alert{display:flex;align-items:center;justify-content:space-between;padding:.35rem 1.5rem;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:linear-gradient(90deg,#1a0e08,#221208,#1a0e08);}
+.alert-l{display:flex;align-items:center;gap:.5rem;}
+.alert-dot{width:7px;height:7px;background:var(--red);border-radius:50%;animation:blink 1s ease-in-out infinite;flex-shrink:0;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.08}}
+.alert-r{color:var(--muted);font-weight:500;}
+
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:.875rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
+.hdr-l{display:flex;align-items:center;gap:.875rem;}
+.hdr-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#2a1204,#1c0c04);border:1px solid var(--red-b);display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+.hdr-title{font-size:1rem;font-weight:700;letter-spacing:-.02em;}
+.hdr-sub{font-size:.7rem;color:var(--muted);}
+.hdr-r{display:flex;align-items:center;gap:.625rem;flex-wrap:wrap;}
+.ts{font-size:.7rem;color:var(--muted);}
+.badge{font-size:.68rem;font-weight:700;padding:.2rem .625rem;border-radius:.375rem;letter-spacing:.04em;white-space:nowrap;}
+.b-green{background:var(--green-d);color:var(--green);border:1px solid var(--green-b);}
+.b-amber{background:var(--amber-d);color:var(--amber);border:1px solid var(--amber-b);}
+.b-red{background:var(--red-d);color:var(--red);border:1px solid var(--red-b);}
+.b-blue{background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b);}
+.b-gray{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--border);}
+
+.main{max-width:1400px;margin:0 auto;padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:1.25rem;}
+.sl{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:.5rem;margin-bottom:.875rem;}
+.sl::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* FOMC RESULT HERO */
+.result-hero{border-radius:1rem;padding:1.375rem 1.5rem;border:1px solid var(--red-b);background:linear-gradient(135deg,rgba(224,88,88,.05),rgba(232,160,32,.03));position:relative;overflow:hidden;}
+.result-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(224,88,88,.07),transparent 55%);pointer-events:none;}
+.rh-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.75rem;}
+.rh-title{font-size:1rem;font-weight:700;color:var(--red);}
+.rh-result-label{font-size:.65rem;font-weight:700;padding:.25rem .75rem;border-radius:.375rem;background:rgba(224,88,88,.12);color:var(--red);border:1px solid var(--red-b);letter-spacing:.05em;}
+.rh-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.875rem;}
+@media(max-width:900px){.rh-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:500px){.rh-grid{grid-template-columns:1fr;}}
+.rh-item{background:var(--surface);border-radius:.625rem;padding:.75rem .875rem;border:1px solid var(--border);}
+.rh-item.hot{border-color:var(--red-b);}
+.rh-label{font-size:.6rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem;}
+.rh-val{font-size:1.2rem;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.1;margin-bottom:.2rem;}
+.rh-sub{font-size:.63rem;color:var(--muted);line-height:1.55;}
+.col-g{color:var(--green);}
+.col-r{color:var(--red);}
+.col-a{color:var(--amber);}
+.col-b{color:var(--blue);}
+.col-p{color:var(--purple);}
+.col-m{color:var(--muted);}
+
+/* WARSH QUOTE */
+.warsh-quote{border-radius:.875rem;padding:1.125rem 1.375rem;background:rgba(232,160,32,.04);border:1px solid var(--amber-b);}
+.wq-label{font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);margin-bottom:.5rem;}
+.wq-text{font-size:.875rem;font-weight:700;color:var(--text);line-height:1.7;font-style:italic;}
+.wq-sub{font-size:.65rem;color:var(--muted);margin-top:.5rem;}
+
+/* IMPLICATION BOX */
+.impl-grid{display:grid;grid-template-columns:1fr 1fr;gap:.875rem;}
+@media(max-width:700px){.impl-grid{grid-template-columns:1fr;}}
+.impl-box{border-radius:.875rem;padding:1rem 1.125rem;border:1px solid;}
+.ib-g{background:rgba(77,186,117,.03);border-color:var(--green-b);}
+.ib-r{background:rgba(224,88,88,.03);border-color:var(--red-b);}
+.ib-title{font-size:.75rem;font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:.375rem;}
+.impl-items{display:flex;flex-direction:column;gap:.4rem;}
+.impl-item{display:flex;gap:.5rem;align-items:flex-start;padding:.4rem .5rem;background:var(--surface-2);border-radius:.4rem;}
+.ii-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:.35rem;}
+.dot-g{background:var(--green);}
+.dot-r{background:var(--red);}
+.dot-a{background:var(--amber);}
+.ii-body{}
+.ii-label{font-size:.7rem;font-weight:700;margin-bottom:1px;}
+.ii-desc{font-size:.63rem;color:var(--muted);line-height:1.55;}
+
+/* PRICE GRID */
+.price-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.75rem;}
+@media(max-width:1200px){.price-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:600px){.price-grid{grid-template-columns:repeat(2,1fr);}}
+.price-card{background:var(--surface);border:1px solid var(--border);border-radius:.75rem;padding:.875rem;position:relative;overflow:hidden;}
+.price-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top left,var(--pg,transparent),transparent 60%);pointer-events:none;}
+.pc-g{--pg:rgba(77,186,117,.07);border-color:rgba(77,186,117,.25);}
+.pc-r{--pg:rgba(224,88,88,.06);border-color:rgba(224,88,88,.22);}
+.pc-a{--pg:rgba(232,160,32,.06);border-color:rgba(232,160,32,.22);}
+.pc-b{--pg:rgba(85,148,202,.06);border-color:rgba(85,148,202,.22);}
+.pc-p{--pg:rgba(155,114,208,.06);border-color:rgba(155,114,208,.22);}
+.pc-label{font-size:.6rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.2rem;}
+.pc-ticker{font-size:.85rem;font-weight:900;margin-bottom:.1rem;}
+.pc-price{font-size:1.4rem;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.1;margin-bottom:.15rem;}
+.pc-ch{font-size:.68rem;font-weight:700;font-variant-numeric:tabular-nums;}
+.pc-note{font-size:.62rem;color:var(--muted);margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--border);line-height:1.55;}
+
+/* ACTION TABLE */
+.stk-table{background:var(--surface);border:1px solid var(--border);border-radius:.875rem;overflow:hidden;}
+.stk-head{display:grid;grid-template-columns:85px 130px 80px 1fr 1fr 145px;gap:.5rem;padding:.6rem 1.125rem;background:var(--surface-2);border-bottom:1px solid var(--border);}
+.stk-row{display:grid;grid-template-columns:85px 130px 80px 1fr 1fr 145px;gap:.5rem;padding:.75rem 1.125rem;border-bottom:1px solid var(--border);align-items:center;}
+.stk-row:last-child{border-bottom:none;}
+.stk-row:hover{background:var(--surface-2);}
+.sth{font-size:.62rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);}
+.s-ticker{font-size:.9rem;font-weight:700;}
+.s-price{font-size:.82rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.35;}
+.s-note{font-size:.63rem;color:var(--muted);line-height:1.55;}
+.action-btn{display:inline-flex;align-items:center;font-size:.65rem;font-weight:700;letter-spacing:.04em;padding:.22rem .55rem;border-radius:.3rem;white-space:nowrap;}
+.a-green{background:var(--green-d);color:var(--green);border:1px solid var(--green-b);}
+.a-amber{background:var(--amber-d);color:var(--amber);border:1px solid var(--amber-b);}
+.a-red{background:var(--red-d);color:var(--red);border:1px solid var(--red-b);}
+.a-blue{background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b);}
+.a-gray{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--border);}
+.a-special{background:linear-gradient(90deg,var(--green-d),var(--blue-d));color:var(--green);border:1px solid var(--green-b);}
+
+/* IRAN MOU BOX */
+.iran-box{border-radius:.875rem;padding:1.125rem 1.375rem;background:linear-gradient(135deg,rgba(77,186,117,.05),rgba(85,148,202,.03));border:1px solid var(--green-b);}
+.iran-title{font-size:.875rem;font-weight:700;color:var(--green);margin-bottom:.875rem;display:flex;align-items:center;gap:.5rem;}
+.iran-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.875rem;}
+@media(max-width:800px){.iran-grid{grid-template-columns:1fr;}}
+.iran-item{background:var(--surface);border-radius:.625rem;padding:.75rem .875rem;border:1px solid var(--border);}
+.iran-item-label{font-size:.62rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem;}
+.iran-item-val{font-size:.85rem;font-weight:700;line-height:1.45;}
+.iran-item-sub{font-size:.63rem;color:var(--muted);margin-top:.2rem;line-height:1.5;}
+
+/* VERDICT */
+.verdict{background:linear-gradient(135deg,rgba(232,160,32,.05),rgba(77,186,117,.03));border:1px solid var(--amber-b);border-radius:.875rem;padding:1.25rem 1.5rem;font-size:.78rem;color:var(--muted);line-height:1.9;}
+.verdict .vt{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:.5rem;display:block;}
+.verdict strong{color:var(--green);}
+.verdict .a{color:var(--amber);}
+.verdict .r{color:var(--red);}
+
+footer{padding:1rem;text-align:center;font-size:.62rem;color:var(--faint);border-top:1px solid var(--border);}
+
+  /* ===== MORNING ROUTINE ===== */
+  .routine-section{background:var(--surface);border:1px solid var(--border);border-radius:1rem;overflow:hidden;}
+
+  .routine-header{padding:1.5rem;background:linear-gradient(135deg,rgba(85,148,202,.05),rgba(77,186,117,.03));border-bottom:1px solid var(--border);}
+  .routine-badge{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:.5rem;}
+  .routine-title{font-size:1.1rem;font-weight:700;margin-bottom:.75rem;}
+  .routine-quote{font-size:.78rem;color:var(--muted);line-height:1.9;padding:.875rem 1rem;background:var(--surface-2);border-radius:.625rem;border-left:3px solid var(--amber);}
+  .routine-quote em{color:var(--amber);font-style:normal;font-weight:700;}
+
+  .routine-steps{display:flex;flex-direction:column;gap:0;}
+  .routine-step{border-bottom:1px solid var(--border);}
+  .routine-step:last-child{border-bottom:none;}
+
+  .step-header{padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+  .step-1{background:linear-gradient(90deg,rgba(77,186,117,.06),transparent);}
+  .step-2{background:linear-gradient(90deg,rgba(85,148,202,.06),transparent);}
+  .step-3{background:linear-gradient(90deg,rgba(232,160,32,.06),transparent);}
+  .step-time{font-size:.65rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--muted);background:var(--surface-2);padding:.2rem .625rem;border-radius:.375rem;border:1px solid var(--border);white-space:nowrap;}
+  .step-num{font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+  .step-title{font-size:.9rem;font-weight:700;flex:1;min-width:200px;}
+  .step-sub{font-size:.65rem;color:var(--muted);width:100%;margin-top:-.375rem;padding-left:0;}
+
+  .step-items{padding:.75rem 1.5rem 1.125rem;display:flex;flex-direction:column;gap:.625rem;}
+  .step-item{display:flex;gap:.875rem;align-items:flex-start;padding:.75rem .875rem;background:var(--surface-2);border-radius:.625rem;border:1px solid var(--border);}
+  .step-check{width:18px;height:18px;border-radius:.3rem;border:2px solid var(--faint);flex-shrink:0;margin-top:.15rem;cursor:pointer;transition:all .18s;position:relative;}
+  .step-check.checked{background:var(--green);border-color:var(--green);}
+  .step-check.checked::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff;}
+  .step-body{flex:1;}
+  .step-label{font-size:.75rem;font-weight:700;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.3rem;}
+  .step-icon{font-size:.85rem;}
+  .step-link{font-size:.62rem;font-weight:700;color:var(--blue);text-decoration:none;padding:.1rem .375rem;background:var(--blue-d);border-radius:.25rem;border:1px solid var(--blue-b);}
+  .step-link:hover{background:var(--blue-b);}
+  .step-desc{font-size:.65rem;color:var(--muted);line-height:1.6;margin-bottom:.375rem;}
+  .step-signal{display:flex;align-items:flex-start;gap:.375rem;font-size:.65rem;margin-bottom:.375rem;}
+  .sig-bullet{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:.35rem;}
+  .sig-green{background:var(--green);}
+  .sig-amber{background:var(--amber);}
+  .sig-red{background:var(--red);}
+  .sig-text{color:var(--muted);line-height:1.55;}
+  .sig-text strong{color:var(--text);}
+
+  .step-now{display:flex;align-items:center;gap:.5rem;padding:.3rem .625rem;background:var(--surface-3);border-radius:.375rem;margin-top:.25rem;}
+  .now-label{font-size:.6rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);white-space:nowrap;}
+  .now-val{font-size:.65rem;font-weight:600;}
+  .trigger-now{background:rgba(77,186,117,.06);border:1px solid var(--green-b);}
+  .trigger-on{color:var(--red);}
+
+  .step-desc-grid{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.375rem;}
+  .desc-row{display:grid;grid-template-columns:160px 1fr;gap:.5rem;font-size:.65rem;padding:.3rem .5rem;border-radius:.3rem;background:var(--surface-3);}
+  .desc-row.highlight{background:rgba(232,160,32,.06);border:1px solid rgba(232,160,32,.15);}
+  .desc-key{font-weight:700;color:var(--amber);}
+  .desc-val{color:var(--muted);}
+  .desc-val strong{color:var(--text);}
+
+  .ticker-pills{display:flex;gap:.3rem;flex-wrap:wrap;}
+  .tick-g{font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:.3rem;background:var(--green-d);color:var(--green);border:1px solid var(--green-b);}
+  .tick-b{font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:.3rem;background:var(--blue-d);color:var(--blue);border:1px solid var(--blue-b);}
+  .tick-p{font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:.3rem;background:var(--purple-d);color:var(--purple);border:1px solid var(--purple-b);}
+
+  /* FINAL DECISION */
+  .final-decision{padding:1.25rem 1.5rem;background:linear-gradient(135deg,rgba(232,160,32,.04),rgba(77,186,117,.03));border-top:1px solid var(--border);}
+  .fd-title{font-size:.9rem;font-weight:700;margin-bottom:.25rem;}
+  .fd-subtitle{font-size:.65rem;color:var(--muted);margin-bottom:1rem;}
+  .fd-grid{display:grid;grid-template-columns:1fr 1fr;gap:.875rem;margin-bottom:1rem;}
+  @media(max-width:700px){.fd-grid{grid-template-columns:1fr;}}
+  .fd-card{border-radius:.75rem;padding:1rem;border:1px solid var(--border);display:flex;flex-direction:column;gap:.75rem;}
+  .fd-idle{background:rgba(77,186,117,.03);border-color:var(--green-b);}
+  .fd-fire{background:rgba(224,88,88,.03);border-color:var(--red-b);}
+  .fd-card-header{display:flex;align-items:center;gap:.625rem;}
+  .fd-status{font-size:.72rem;font-weight:700;padding:.2rem .5rem;border-radius:.375rem;}
+  .fd-status-idle{background:var(--green-d);color:var(--green);border:1px solid var(--green-b);}
+  .fd-status-fire{background:var(--red-d);color:var(--red);border:1px solid var(--red-b);}
+  .fd-card-title{font-size:.78rem;font-weight:700;}
+  .fd-card-body{font-size:.68rem;color:var(--muted);line-height:1.75;display:flex;flex-direction:column;gap:.5rem;}
+  .fd-card-body strong{color:var(--text);}
+  .fd-highlight{padding:.375rem .625rem;background:var(--surface-2);border-radius:.375rem;color:var(--text);}
+  .fd-warning{font-size:.68rem;font-weight:700;color:var(--amber);padding:.3rem .625rem;background:var(--amber-d);border-radius:.375rem;border:1px solid var(--amber-b);}
+  .fd-fire-action{display:flex;gap:.5rem;align-items:flex-start;padding:.5rem .625rem;background:rgba(224,88,88,.07);border-radius:.375rem;border:1px solid var(--red-b);}
+  .fire-icon{font-size:1rem;flex-shrink:0;}
+  .fd-targets{display:flex;align-items:center;gap:.375rem;flex-wrap:wrap;}
+  .fd-today{padding:.4rem .625rem;background:var(--surface);border-radius:.375rem;border:1px solid var(--border);display:flex;gap:.5rem;align-items:center;font-size:.65rem;}
+  .today-label{font-weight:700;color:var(--muted);white-space:nowrap;}
+  .fd-tags{display:flex;flex-wrap:wrap;gap:.375rem;}
+  .fd-tag{font-size:.62rem;font-weight:600;padding:.2rem .5rem;background:var(--surface-2);border-radius:.375rem;border:1px solid var(--border);color:var(--muted);}
+
+</style>
+</head>
+<body>
+
+<div class="alert">
+  <div class="alert-l">
+    <div class="alert-dot"></div>
+    🏛 FOMC 결과 확정: 동결 + 점도표 HAWKISH (2026년 말 중간값 3.8% = 인상 시사) · WTI $75 · 이란 MOU 서명 D-1 (내일 6/19) · FERC D-12 · Goldman CEG 목표가 $305 신규
+  </div>
+  <div class="alert-r">2026-06-18 · 목요일 09:09 EDT</div>
+</div>
+
+<header class="hdr">
+  <div class="hdr-l">
+    <div class="hdr-mark">📊</div>
+    <div>
+      <div class="hdr-title">윌리엄 패권 대시보드 — 6/18 목요일</div>
+      <div class="hdr-sub">FOMC 결과 해석 + 포트 재편 실행일 · 이란 MOU D-1 · FERC D-12</div>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <span class="ts">2026-06-18 · 09:09 EDT</span>
+    <span class="badge b-red">🏛 FOMC 완료 · 점도표 HAWKISH</span>
+    <span class="badge b-green">☮️ 이란 MOU D-1</span>
+    <span class="badge b-amber">⚡ FERC D-12</span>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- FOMC RESULT HERO -->
+  <div class="result-hero">
+    <div class="rh-top">
+      <div class="rh-title">🏛 FOMC 6/17 결과 확정 — 경계 시나리오 현실화 (예상 30~35%)</div>
+      <div class="rh-result-label">⚠️ 경계 시나리오 · SPAXX 봉인 유지</div>
+    </div>
+    <div class="rh-grid">
+      <div class="rh-item hot">
+        <div class="rh-label">금리 결정</div>
+        <div class="rh-val col-a">동결</div>
+        <div class="rh-sub">3.50~3.75% 유지. 만장일치 12-0. 예상대로 — 시장 충격 없음.</div>
+      </div>
+      <div class="rh-item hot">
+        <div class="rh-label">점도표 2026년 말 중간값</div>
+        <div class="rh-val col-r">3.8% ↑</div>
+        <div class="rh-sub">3월 3.4% → 6월 3.8%. 현재 대비 +25bp. 연내 인상 1회 시사. 18/19명 반영.</div>
+      </div>
+      <div class="rh-item">
+        <div class="rh-label">위원 분열</div>
+        <div class="rh-val col-a">9 vs 9</div>
+        <div class="rh-sub">9명: 인상 예상 (6명은 복수 인상). 9명: 동결·인하 예상. 정확히 반반.</div>
+      </div>
+      <div class="rh-item">
+        <div class="rh-label">인플레 리스크 인식</div>
+        <div class="rh-val col-r">17/18</div>
+        <div class="rh-sub">17명 "인플레 위험 상방 기울어짐" 판단. Warsh: "가격 안정 전선에 할 일 있다."</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WARSH QUOTE -->
+  <div class="warsh-quote">
+    <div class="wq-label">💬 Kevin Warsh — 6/17 기자회견 핵심 발언</div>
+    <div class="wq-text">"The FOMC has some work to do on the price-stability front. Strong productivity-led growth is not something we fear, but something we embrace."</div>
+    <div class="wq-sub">→ 번역: "인플레이션 아직 안 잡혔다. 인상 가능성 열려있다. 하지만 생산성 성장은 환영한다." — Warsh 자신의 점도표 미공개 (task force 설립 발표). Goldman Sachs: 2026년 인하 없음, 인상 가능성 높아짐 이미 선반영.</div>
+  </div>
+
+  <!-- IMPLICATIONS -->
+  <div>
+    <div class="sl">🔍 FOMC 결과 → 포트폴리오 파급효과 분석</div>
+    <div class="impl-grid">
+      <div class="impl-box ib-g">
+        <div class="ib-title" style="color:var(--green)">✅ 오히려 강해지는 것들</div>
+        <div class="impl-items">
+          <div class="impl-item">
+            <div class="ii-dot dot-g"></div>
+            <div class="ii-body">
+              <div class="ii-label">CEG — Goldman $305 목표가 신규 (오늘)</div>
+              <div class="ii-desc">Goldman Sachs가 오늘 CEG Neutral 개시 · 목표가 $305 발표. FOMC 매파에도 불구, 원전 FERC 구조는 금리와 무관. 현재 $270 → 목표 $305 (+13%).</div>
+            </div>
+          </div>
+          <div class="impl-item">
+            <div class="ii-dot dot-g"></div>
+            <div class="ii-body">
+              <div class="ii-label">PWR · FERC D-12 — 금리 무관한 수주 구조</div>
+              <div class="ii-desc">그리드 시공 수주는 금리보다 전력 수요가 결정. FERC D-12 카운트다운. 인상 환경에서도 실적 방어적. $10억 자사주 매입 지지선.</div>
+            </div>
+          </div>
+          <div class="impl-item">
+            <div class="ii-dot dot-g"></div>
+            <div class="ii-body">
+              <div class="ii-label">SPAXX — 5% 이자 연장 확정</div>
+              <div class="ii-desc">인상 시사 = 고금리 장기화 = SPAXX 5%+이자 구조 더 오래 유지. 봉인 연장 = 실탄 5% 수익 계속 확정. 나쁜 것만은 아님.</div>
+            </div>
+          </div>
+          <div class="impl-item">
+            <div class="ii-dot dot-g"></div>
+            <div class="ii-body">
+              <div class="ii-label">WTI $75 — VST·NEE 연료비 더 낮아진다</div>
+              <div class="ii-desc">유가 추가 하락 = 발전 연료비↓ = 유틸리티 마진↑. 금리 인상 리스크를 유가 하락 이익이 상쇄. 유틸리티 가장 방어적.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="impl-box ib-r">
+        <div class="ib-title" style="color:var(--red)">⚠️ 보류 또는 조정 필요한 것들</div>
+        <div class="impl-items">
+          <div class="impl-item">
+            <div class="ii-dot dot-r"></div>
+            <div class="ii-body">
+              <div class="ii-label">MSFT·PLTR — 9월 FOMC까지 진입 보류</div>
+              <div class="ii-desc">점도표 3.8% = 성장주 할인율 상승 우려. 진입 서두르지 않음. 9월 FOMC(9/16) 확인 후 재검토. SPAXX 봉인 유지.</div>
+            </div>
+          </div>
+          <div class="impl-item">
+            <div class="ii-dot dot-r"></div>
+            <div class="ii-body">
+              <div class="ii-label">SPCX — 이틀 급등 후 FOMC 반응 하락</div>
+              <div class="ii-desc">Schwab 리포트: "SPCX shares fell after three days of gains." Warsh 기자회견 후 차익실현. 금리 인상 환경 = 성장주 과열 해소. 눌림 확인 후 씨앗 진입 검토.</div>
+            </div>
+          </div>
+          <div class="impl-item">
+            <div class="ii-dot dot-a"></div>
+            <div class="ii-body">
+              <div class="ii-label">NEE — 금리 인상 시 유틸리티 할인율 압박</div>
+              <div class="ii-desc">NEE는 금리 민감도 가장 높음. 3.8% 점도표 → 단기 조정 가능. BUT WTI $75 이익으로 상쇄 중. 홀드 유지하되 추가 매수는 보류.</div>
+            </div>
+          </div>
+          <div class="impl-item">
+            <div class="ii-dot dot-a"></div>
+            <div class="ii-body">
+              <div class="ii-label">UUUU — 이중 압박 (금리↑ + 유가↓)</div>
+              <div class="ii-desc">고금리 = 소형주 할인율 압박. 유가 하락도 에너지 섹터 심리 악화. 하지만 우라늄·희토류 펀더멘털 훼손 없음. 1차 포지션 홀드.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IRAN MOU BOX -->
+  <div class="iran-box">
+    <div class="iran-title">☮️ 이란 MOU 공식 서명 — 내일 6/19 스위스 · D-1</div>
+    <div class="iran-grid">
+      <div class="iran-item">
+        <div class="iran-item-label">서명 일정</div>
+        <div class="iran-item-val col-g">6/19 (내일) 스위스 제네바</div>
+        <div class="iran-item-sub">미 행정부 고위관계자가 14개 항목 MOU 문서 공개. 트럼프·펙제시키안 서명. 60일 협상 카운트 시작.</div>
+      </div>
+      <div class="iran-item">
+        <div class="iran-item-label">핵심 14개 항목</div>
+        <div class="iran-item-val col-a">호르무즈 재개통 + 봉쇄 해제</div>
+        <div class="iran-item-sub">모든 전선 즉각 군사작전 중단. 호르무즈 30일 내 완전 재개통. 미 해상봉쇄 해제. 이란 핵 협상 60일 별도.</div>
+      </div>
+      <div class="iran-item">
+        <div class="iran-item-label">포트 임팩트</div>
+        <div class="iran-item-val col-g">백팀 구조 강화 완성</div>
+        <div class="iran-item-sub">서명 완료 = 지정학 리스크 공식 종결. CEG·PWR FERC 순수 펀더멘털만 남음. WTI $75 이하 추가 압박 가능 → VST·NEE 추가 수혜.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE SNAPSHOT -->
+  <div>
+    <div class="sl">📊 주요 종목 현황 — 6/17 FOMC 반응 후 6/18 현재</div>
+    <div class="price-grid">
+      <div class="price-card pc-g">
+        <div class="pc-label">백팀 · Goldman $305</div>
+        <div class="pc-ticker col-g">CEG</div>
+        <div class="pc-price col-g">$268~270</div>
+        <div class="pc-ch col-a">Goldman 오늘 $305 목표가 신규</div>
+        <div class="pc-note">6/16 종가 $269.81. PM $268. FOMC 매파에도 원전 구조 방어. Goldman "Neutral·$305" 개시 = 사실상 상방 확인. FERC D-12.</div>
+      </div>
+      <div class="price-card pc-g">
+        <div class="pc-label">백팀 · FERC D-12</div>
+        <div class="pc-ticker col-g">PWR</div>
+        <div class="pc-price col-g">$714~720</div>
+        <div class="pc-ch col-a">FOMC 후 소폭 조정</div>
+        <div class="pc-note">6/17 종가 $714.85. 매파 점도표 반응 소폭 하락. 하지만 FERC D-12 + 자사주 $10억 = 강한 하방 지지. 52주 고점 $788 회복 경로 유지.</div>
+      </div>
+      <div class="price-card pc-g">
+        <div class="pc-label">우라늄 · 희토류</div>
+        <div class="pc-ticker col-g">UUUU</div>
+        <div class="pc-price col-g">~$15</div>
+        <div class="pc-ch col-a">FOMC 매파 + 유가↓ 이중 압박</div>
+        <div class="pc-note">1차 포지션 홀드. 우라늄·희토류 펀더멘털 훼손 없음. 이란 MOU 서명 후 에너지 안보 구조 재정립 시 반등 기대.</div>
+      </div>
+      <div class="price-card pc-r">
+        <div class="pc-label">유가 · 이란 MOU</div>
+        <div class="pc-ticker col-r">WTI</div>
+        <div class="pc-price col-r">$75.33</div>
+        <div class="pc-ch col-r">–$1.46 · 전쟁 이전 수준 접근</div>
+        <div class="pc-note">이란 공급 복귀 기대 본격화. 6/11 고점 $90 대비 –17%. 전쟁 전 $60 수준까지 추가 하락 가능. VST·NEE 연료비 추가 절감.</div>
+      </div>
+      <div class="price-card pc-p">
+        <div class="pc-label">역대 IPO · 차익실현</div>
+        <div class="pc-ticker col-p">SPCX</div>
+        <div class="pc-price col-p">조정 중</div>
+        <div class="pc-ch col-r">FOMC 후 차익실현</div>
+        <div class="pc-note">3일 누적 +35% 후 Warsh 기자회견 반응으로 하락. 눌림 $160~165 구간 도달 시 씨앗 진입 재검토. 서두르지 말 것.</div>
+      </div>
+      <div class="price-card pc-a">
+        <div class="pc-label">10Y 금리</div>
+        <div class="pc-ticker col-a">UST 10Y</div>
+        <div class="pc-price col-a">4.48~4.55%</div>
+        <div class="pc-ch col-r">점도표 매파 반응</div>
+        <div class="pc-note">점도표 3.8% → 금리 소폭 상승 압박. Goldman: 2027년 6월 첫 인하. 고금리 장기화 = SPAXX 5%+ 이자 계속 확정.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTION TABLE -->
+  <div>
+    <div class="sl">🎯 포트폴리오 전체 — 6/18 FOMC 이후 최종 행동 강령</div>
+    <div class="stk-table">
+      <div class="stk-head">
+        <span class="sth">종목</span>
+        <span class="sth">현재가</span>
+        <span class="sth">레이어</span>
+        <span class="sth">FOMC 이후 상황</span>
+        <span class="sth">이란 MOU D-1 영향</span>
+        <span class="sth">최종 액션</span>
+      </div>
+
+      <div class="stk-row">
+        <span class="s-ticker col-g">CEG</span>
+        <div class="s-price col-g">$268~270<br><span style="font-size:.62rem;color:var(--green)">Goldman $305 신규</span></div>
+        <span><span class="badge b-green">백팀</span></span>
+        <span class="s-note">FOMC 매파에도 방어. Goldman 오늘 $305 목표가 신규 개시. FERC D-12. 원전 전력계약 가격은 금리와 무관. 가장 강한 포지션.</span>
+        <span class="s-note">이란 서명 = 장기 원전 투자 가속. 지정학 리스크 프리미엄 해소 완성. $305 → $368 경로.</span>
+        <span><span class="action-btn a-green">📌 적극 홀드</span></span>
+      </div>
+
+      <div class="stk-row">
+        <span class="s-ticker col-g">PWR</span>
+        <div class="s-price col-g">$714~720<br><span style="font-size:.62rem;color:var(--amber)">FOMC 소폭 조정</span></div>
+        <span><span class="badge b-green">백팀</span></span>
+        <span class="s-note">그리드 수주는 금리 무관. FERC D-12 직접 수혜. $10억 자사주 매입 하방 지지. 52주 고점 $788 회복 경로 유지. 가장 방어적.</span>
+        <span class="s-note">이란 MOU = 중동 재건 인프라 수주 모멘텀 추가. 전후 그리드 확장 수요.</span>
+        <span><span class="action-btn a-green">📌 적극 홀드</span></span>
+      </div>
+
+      <div class="stk-row">
+        <span class="s-ticker col-g">UUUU</span>
+        <div class="s-price col-g">~$15<br><span style="font-size:.62rem;color:var(--amber)">이중 압박 중</span></div>
+        <span><span class="badge b-green">백팀</span></span>
+        <span class="s-note">고금리 + 유가 $75 이중 압박. 하지만 우라늄 공급 구조·희토류 사업 펀더멘털 훼손 없음. 1차 진입 홀드. 2차 진입 보류.</span>
+        <span class="s-note">이란 서명 후 에너지 안보 구조 재정립 = 우라늄 수요 장기 유효. 인내 필요.</span>
+        <span><span class="action-btn a-amber">홀드 · 2차 보류</span></span>
+      </div>
+
+      <div class="stk-row">
+        <span class="s-ticker col-g">VST / NEE</span>
+        <div class="s-price col-g">홀드<br><span style="font-size:.62rem;color:var(--green)">WTI $75 = 마진↑</span></div>
+        <span><span class="badge b-green">백팀</span></span>
+        <span class="s-note">WTI $75 연료비 절감 + FERC D-12. 금리 인상 리스크는 유가 하락 이익이 상쇄. 가장 방어적이며 구조적으로 유리. NEE는 금리 민감하나 균형 유지.</span>
+        <span class="s-note">이란 서명 = 유가 추가 하락 가능 → 연료비↓ 지속. 유틸리티 최적 환경.</span>
+        <span><span class="action-btn a-green">📌 홀드</span></span>
+      </div>
+
+      <div class="stk-row">
+        <span class="s-ticker col-b">MSFT / PLTR</span>
+        <div class="s-price col-b">진입 보류<br><span style="font-size:.62rem;color:var(--red)">9월 FOMC까지</span></div>
+        <span><span class="badge b-blue">교집합</span></span>
+        <span class="s-note">점도표 3.8% = 성장주 할인율 상승 리스크. 9월 FOMC(9/16) 결과 확인 후 재검토. 지금 서두르면 금리 인상 직격. 인내가 수익.</span>
+        <span class="s-note">이란 서명은 지정학 해소 긍정적. 하지만 FOMC 금리가 더 큰 변수. 9월까지 대기.</span>
+        <span><span class="action-btn a-gray">⏳ 9월 FOMC 후</span></span>
+      </div>
+
+      <div class="stk-row">
+        <span class="s-ticker col-p">SPCX</span>
+        <div class="s-price col-p">조정 중<br><span style="font-size:.62rem;color:var(--red)">FOMC 차익실현</span></div>
+        <span><span class="badge b-gray">씨앗</span></span>
+        <span class="s-note">3일 +35% 후 FOMC 반응 차익실현. $160~165 눌림 구간 도달 시 소액 씨앗 재검토. 금리 인상 환경 = 과열 성장주 조정. 서두르지 말 것.</span>
+        <span class="s-note">이란 딜 = 우주 산업 규제 환경 개선 (간접). 서명 후 모멘텀 재확인.</span>
+        <span><span class="action-btn a-gray">눌림 대기</span></span>
+      </div>
+
+      <div class="stk-row">
+        <span class="s-ticker col-m">SPAXX</span>
+        <div class="s-price col-m">5%+ 이자<br><span style="font-size:.62rem;color:var(--green)">봉인 연장 확정</span></div>
+        <span><span class="badge b-gray">실탄</span></span>
+        <span class="s-note">점도표 3.8% = 고금리 장기화 = SPAXX 5%+ 이자 더 오래 확정. MSFT·PLTR 진입 보류 = 실탄 9월까지 계속 이자 수익. 봉인 연장이 최선.</span>
+        <span class="s-note">이란 서명 후 SPAXX 일부 해제 → 이란 재건 테마 직접 플레이 검토 가능.</span>
+        <span><span class="action-btn a-green">🔒 봉인 연장 · 이자 확정</span></span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="verdict">
+    <span class="vt">📊 6/18 패권자 한 줄 정리</span>
+    <strong>"FOMC는 예상 경계 시나리오로 끝났다. 전략 변경 없음 — 백팀 홀드, SPAXX 봉인 연장, MSFT·PLTR 9월 대기."</strong><br><br>
+    어제 FOMC는 동결했지만 점도표가 매파로 돌아섰다. 2026년 말 중간값 3.8%, 17/18명이 인플레 상방 리스크 인식. Warsh은 "가격 안정에 할 일이 있다"고 명시했다. <span class="r">성장주 진입은 9월 FOMC까지 보류가 맞다.</span><br><br>
+    <span class="a">하지만 CEG에서 오늘 반전 뉴스가 나왔다 — Goldman Sachs가 목표가 $305 신규 개시.</span> FERC D-12, 이란 MOU 내일 서명. 원전·그리드 포지션은 금리 환경과 무관하게 강하다.<br><br>
+    <strong>내일 6/19 이란 MOU 공식 서명이 완료되면 포트폴리오의 지정학 리스크가 완전히 사라지고, 남는 건 FERC·AI CAPEX·Goldman $305~$368 순수 펀더멘털뿐이다. SPAXX는 계속 5% 먹으면서 기다리면 된다.</strong>
+  </div>
+
+
+  <!-- MORNING ROUTINE SECTION -->
+  <div class="routine-section">
+    <div class="routine-header">
+      <div class="routine-badge">📋 와썹윌리엄 실전완결</div>
+      <div class="routine-title">상위 1% 패권자의 15분 모닝 루틴</div>
+      <div class="routine-quote">
+        "하수들은 아침마다 내 계좌의 <em>결과</em>를 확인하지만,<br>
+        패권자는 돈이 쏟아져 들어올 <em>원인(지표)</em>을 확인한다."
+      </div>
+    </div>
+
+    <!-- 3 STEPS -->
+    <div class="routine-steps">
+
+      <!-- STEP 1 -->
+      <div class="routine-step">
+        <div class="step-header step-1">
+          <div class="step-time">00:00 ~ 05:00</div>
+          <div class="step-num">1단계</div>
+          <div class="step-title">🌊 거시 유동성 수위 체크</div>
+          <div class="step-sub">FRED &amp; 매크로 — 시장에 돈이 들어오는지, 빠지는지 전체 수량 확인</div>
+        </div>
+        <div class="step-items">
+
+          <div class="step-item">
+            <div class="step-check" id="c1"></div>
+            <div class="step-body">
+              <div class="step-label">
+                <span class="step-icon">💧</span>
+                역레포(RRP) 잔고 확인
+                <a href="https://fred.stlouisfed.org/series/RRPONTSYD" target="_blank" rel="noopener noreferrer" class="step-link">FRED 바로가기 ↗</a>
+              </div>
+              <div class="step-desc">간밤에 연준의 역레포 대기 자금이 줄어들었는가?</div>
+              <div class="step-signal">
+                <span class="sig-bullet sig-green"></span>
+                <span class="sig-text">Zero에 수렴할수록 시장에 유동성이 풀린다는 <strong>강력한 신호</strong></span>
+              </div>
+              <div class="step-now">
+                <span class="now-label">지금 현황</span>
+                <span class="now-val col-g">급감 추세 지속 중 → 유동성 시장 진입 대기</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-check" id="c2"></div>
+            <div class="step-body">
+              <div class="step-label">
+                <span class="step-icon">📈</span>
+                국채 금리 역전 해소 여부
+              </div>
+              <div class="step-desc">10년물과 2년물 금리 스프레드 확인 — 정상화되며 단기 금리가 급락하면?</div>
+              <div class="step-signal">
+                <span class="sig-bullet sig-amber"></span>
+                <span class="sig-text">정상화 급락 시 → <strong>자본 이동의 1차 경고등 발동</strong></span>
+              </div>
+              <div class="step-now">
+                <span class="now-label">지금 현황</span>
+                <span class="now-val col-a">FOMC 점도표 3.8% → 2Y 상승 압박, 스프레드 역전 심화 중</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-check" id="c3"></div>
+            <div class="step-body">
+              <div class="step-label">
+                <span class="step-icon">📰</span>
+                스텔스 QE 뉴스 스캔
+                <a href="https://www.wsj.com" target="_blank" rel="noopener noreferrer" class="step-link">WSJ ↗</a>
+              </div>
+              <div class="step-desc">"연준 은행 규제 완화", "BTFP 연장/유사 프로그램 등장" 키워드 — WSJ 헤드라인 1분 스캔</div>
+              <div class="step-signal">
+                <span class="sig-bullet sig-green"></span>
+                <span class="sig-text">키워드 등장 즉시 → 유동성 공급 신호 확인</span>
+              </div>
+              <div class="step-now">
+                <span class="now-label">지금 현황</span>
+                <span class="now-val col-m">없음 — Warsh 매파 기조 유지 중</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="routine-step">
+        <div class="step-header step-2">
+          <div class="step-time">05:00 ~ 10:00</div>
+          <div class="step-num">2단계</div>
+          <div class="step-title">🔗 온체인 스텔스 자본 추적</div>
+          <div class="step-sub">rwa.xyz &amp; Arkham — 전통 금융의 돈이 디지털 네트워크(RWA)로 넘어오는지 추적</div>
+        </div>
+        <div class="step-items">
+
+          <div class="step-item">
+            <div class="step-check" id="c4"></div>
+            <div class="step-body">
+              <div class="step-label">
+                <span class="step-icon">🏦</span>
+                rwa.xyz 대시보드 (USTB, BUIDL)
+                <a href="https://app.rwa.xyz" target="_blank" rel="noopener noreferrer" class="step-link">rwa.xyz ↗</a>
+              </div>
+              <div class="step-desc-grid">
+                <div class="desc-row">
+                  <span class="desc-key">TVL 급증?</span>
+                  <span class="desc-val">기관 자본 대거 유입 확인</span>
+                </div>
+                <div class="desc-row highlight">
+                  <span class="desc-key">7D APY &lt; 2.5% 붕괴?</span>
+                  <span class="desc-val">⚡ RWA에 파킹된 돈이 주식/코인으로 튀어나갈 <strong>역전 임계점 임박</strong></span>
+                </div>
+              </div>
+              <div class="step-now">
+                <span class="now-label">지금 현황</span>
+                <span class="now-val col-a">SPAXX 5%+ 경쟁 → RWA 자금 이동 아직 미미. 임계점 미도달.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-check" id="c5"></div>
+            <div class="step-body">
+              <div class="step-label">
+                <span class="step-icon">🕵️</span>
+                Arkham 알람 확인
+                <a href="https://platform.arkhamintelligence.com" target="_blank" rel="noopener noreferrer" class="step-link">Arkham ↗</a>
+              </div>
+              <div class="step-desc-grid">
+                <div class="desc-row highlight">
+                  <span class="desc-key">USDT/USDC 수억달러 신규 발행(Minting)?</span>
+                  <span class="desc-val">스마트 머니 실탄 장전 신호</span>
+                </div>
+                <div class="desc-row highlight">
+                  <span class="desc-key">코인베이스 프라임 or 기관 OTC 지갑 이동?</span>
+                  <span class="desc-val">⚡ <strong>매수 실탄 장전 완료 확인</strong></span>
+                </div>
+              </div>
+              <div class="step-now">
+                <span class="now-label">지금 현황</span>
+                <span class="now-val col-m">대규모 Minting 알람 없음 — 대기 상태</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="routine-step">
+        <div class="step-header step-3">
+          <div class="step-time">10:00 ~ 15:00</div>
+          <div class="step-num">3단계</div>
+          <div class="step-title">⚡ 4대 독점 인프라 트리거 스캐닝</div>
+          <div class="step-sub">보유 핵심 노드 기업들의 밸류에이션을 폭발시킬 방아쇠 뉴스만 찾는다</div>
+        </div>
+        <div class="step-items">
+
+          <div class="step-item">
+            <div class="step-check" id="c6"></div>
+            <div class="step-body">
+              <div class="step-label">
+                <span class="step-icon">⚡</span>
+                전력·에너지 트리거
+                <span class="ticker-pills">
+                  <span class="tick-g">CEG</span>
+                  <span class="tick-g">SMR</span>
+                  <span class="tick-g">PWR</span>
+                </span>
+              </div>
+              <div class="step-desc">FERC 송전망 규제 완화 뉴스, 빅테크와의 추가 BTM(원전 직통 연결) 계약 공시가 있는가?</div>
+              <div class="step-now trigger-now">
+                <span class="now-label trigger-on">🔴 지금 D-12</span>
+                <span class="now-val col-g">FERC 대형 부하 연계 규정 6월 말 최종 액션 대기 + Goldman CEG $305 신규</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-check" id="c7"></div>
+            <div class="step-body">
+              <div class="step-label">
+                <span class="step-icon">🤖</span>
+                데이터·AI 트리거
+                <span class="ticker-pills">
+                  <span class="tick-b">PLTR</span>
+                  <span class="tick-b">PL</span>
+                  <span class="tick-b">MSFT</span>
+                </span>
+              </div>
+              <div class="step-desc">빅테크의 CAPEX 상향 조정 발표, 정부/국방부의 데이터 온톨로지 대규모 수주 뉴스가 떴는가?</div>
+              <div class="step-now">
+                <span class="now-label">지금 현황</span>
+                <span class="now-val col-a">FOMC 3.8% 매파 → 진입 9월까지 보류. CAPEX 뉴스만 모니터링.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-check" id="c8"></div>
+            <div class="step-body">
+              <div class="step-label">
+                <span class="step-icon">🏛</span>
+                규제·금융 트리거
+                <span class="ticker-pills">
+                  <span class="tick-p">COIN</span>
+                  <span class="tick-p">BLK</span>
+                </span>
+              </div>
+              <div class="step-desc">SEC의 SAB 121 폐기 확정, RWA 토큰의 적격 담보물 인정 뉴스가 블룸버그 메인에 걸렸는가?</div>
+              <div class="step-now">
+                <span class="now-label">지금 현황</span>
+                <span class="now-val col-a">SAB 121 논의 진행 중 — 확정 뉴스 없음. 대기.</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FINAL DECISION -->
+    <div class="final-decision">
+      <div class="fd-title">🎯 최종 결정 — 오늘의 행동 강령</div>
+      <div class="fd-subtitle">3단계 15분 스캔 완료 후, 기계처럼 둘 중 하나의 행동만 한다</div>
+
+      <div class="fd-grid">
+        <div class="fd-card fd-idle">
+          <div class="fd-card-header">
+            <div class="fd-status fd-status-idle">🟢 IDLE</div>
+            <div class="fd-card-title">트리거 미발동 — 평시 상태</div>
+          </div>
+          <div class="fd-card-body">
+            <p>창을 모두 닫는다.</p>
+            <p class="fd-highlight">SPAXX에서 나오는 <strong>5%대 안전 이자를 즐기며</strong> 본업(현금흐름 창출)에 집중한다.</p>
+            <div class="fd-warning">⚠️ 주가 창 보지 마라</div>
+          </div>
+          <div class="fd-today">
+            <span class="today-label">오늘 6/18 상태</span>
+            <span class="today-val col-g">✅ IDLE — SPAXX 봉인 유지</span>
+          </div>
+        </div>
+
+        <div class="fd-card fd-fire">
+          <div class="fd-card-header">
+            <div class="fd-status fd-status-fire">🔴 FIRE</div>
+            <div class="fd-card-title">트리거 동시 발동 — 변곡점 도달</div>
+          </div>
+          <div class="fd-card-body">
+            <p>RWA 수익률이 깨지고, Arkham에 대규모 달러 유입이 찍히며, 규제 완화 뉴스가 터졌다?</p>
+            <div class="fd-fire-action">
+              <span class="fire-icon">🚀</span>
+              <span><strong>SPAXX 봉인 해제</strong> — 모아둔 현금을 폭락장 바닥을 기고 있는 1등 인프라 주식에 시장가로 꽂아 넣는다</span>
+            </div>
+            <div class="fd-targets">
+              <span class="tick-g">CEG</span>
+              <span class="tick-b">PLTR</span>
+              <span class="tick-p">COIN</span>
+              <span style="font-size:.62rem;color:var(--muted)">등 1등 인프라</span>
+            </div>
+          </div>
+          <div class="fd-today">
+            <span class="today-label">발동 조건</span>
+            <span class="today-val col-a">3개 트리거 동시 → 9월 FOMC 비둘기 전환 시 최우선</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="fd-tags">
+        <span class="fd-tag">#모닝루틴</span>
+        <span class="fd-tag">#패권자의아침</span>
+        <span class="fd-tag">#유동성체크</span>
+        <span class="fd-tag">#rwa.xyz</span>
+        <span class="fd-tag">#실전투자</span>
+        <span class="fd-tag">#와썹윌리엄</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+<footer>
+  윌리엄 패권 대시보드 · 2026-06-18 09:09 EDT · CNBC FOMC 결과 · StockTitan 점도표 · Yahoo Finance Goldman $305 · MarketWatch WTI · Al Jazeera 이란 MOU · Schwab SPCX · 투자는 본인 책임
+</footer>
+
+<script>
+document.querySelectorAll('.step-check').forEach(function(el){
+  el.addEventListener('click', function(){
+    this.classList.toggle('checked');
+  });
+});
+</script>
+
+</body>
+</html>
